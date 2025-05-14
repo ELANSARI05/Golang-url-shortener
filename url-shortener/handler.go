@@ -56,7 +56,7 @@ func shortenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := ShortenResponse{
-		ShortURL: "http://localhost:8080/" + slug,
+		ShortURL: "http://localhost:8080/r/" + slug,
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
@@ -64,7 +64,7 @@ func shortenHandler(w http.ResponseWriter, r *http.Request) {
 
 // RedirectHandler handles GET /{slug}
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
-	slug := strings.TrimPrefix(r.URL.Path, "/")
+	slug := strings.TrimPrefix(r.URL.Path, "/r/")
 	if slug == "" {
 		http.Error(w, "Slug required", http.StatusBadRequest)
 		return
@@ -95,4 +95,11 @@ func statsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(stats)
+}
+func getAllHandler(w http.ResponseWriter, r *http.Request) {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(urlStore)
 }

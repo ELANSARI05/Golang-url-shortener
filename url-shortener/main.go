@@ -11,13 +11,19 @@ func main() {
 		log.Fatalf("Failed to load data from file: %v", err)
 	}
 
-	// Route to handle URL shortening
-	http.HandleFunc("/shorten", shortenHandler)
+	// Serve index.html manually when accessing root
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/index.html")
+	})
 
-	// Route to handle redirection
-	http.HandleFunc("/", redirectHandler)
+	// API endpoints
+	http.HandleFunc("/shorten", shortenHandler) // for POSTing new links
+	http.HandleFunc("/all", getAllHandler)      // for fetching all links as JSON
+	http.HandleFunc("/stats/", statsHandler)    // optional
+	http.HandleFunc("/r/", redirectHandler)     // handles short link redirection
 
-	http.HandleFunc("/stats/", statsHandler)
+	// Optional: serve other static assets (CSS/JS if needed later)
+	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	log.Println("Server is running on http://localhost:8080...")
 	err = http.ListenAndServe(":8080", nil)
