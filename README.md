@@ -4,7 +4,7 @@ A simple, fast, and interactive URL shortener built with Go.
 
 Create short URLs for long links, customize your slugs, track click statistics, and interact through a clean frontend or REST API — all stored persistently using `data.json`.
 
-![screenshot](preview.png) <!-- optional screenshot -->
+![screenshot](preview.PNG) <!-- optional screenshot -->
 
 ---
 
