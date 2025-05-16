@@ -3,31 +3,30 @@ package main
 import (
 	"log"
 	"net/http"
+
+	"url-shortener/db"
+	"url-shortener/middleware"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := loadFromFile()
+	// Load environment variables from config.env
+	err := godotenv.Load("config.env")
 	if err != nil {
-		log.Fatalf("Failed to load data from file: %v", err)
+		log.Fatal("Error loading config.env file:", err)
 	}
 
-	// Serve index.html manually when accessing root
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "static/index.html")
-	})
+	//Initialize session store after loading env
+	middleware.InitSessionStore()
 
-	// API endpoints
-	http.HandleFunc("/shorten", shortenHandler) // for POSTing new links
-	http.HandleFunc("/all", getAllHandler)      // for fetching all links as JSON
-	http.HandleFunc("/stats/", statsHandler)    // optional
-	http.HandleFunc("/r/", redirectHandler)     // handles short link redirection
+	db.Init()
 
-	// Optional: serve other static assets (CSS/JS if needed later)
-	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	RegisterRoutes()
 
-	log.Println("Server is running on http://localhost:8080...")
+	log.Println("Server started at :8080")
 	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		log.Fatal("Server error:", err)
 	}
 }

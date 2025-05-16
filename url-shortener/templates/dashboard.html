@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard | Go URL Shortener</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    // Prevent back button from showing cached dashboard after logout
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && performance.getEntriesByType("navigation")[0].type === "back_forward")) {
+            window.location.reload(); // Force reload to trigger session check
+        }
+    });
+</script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f1f3f5;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .form-section {
+      margin-bottom: 2rem;
+    }
+    input, button {
+      padding: 12px;
+      width: 100%;
+      margin-top: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .message {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    .message.error {
+      color: #e74c3c;
+    }
+    .logout {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: left;
+    }
+    th {
+      background: #f5f5f5;
+    }
+    a {
+      color: #007BFF;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    form.inline {
+      display: inline;
+    }
+    @media (max-width: 600px) {
+      th, td {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Go URL Shortener</h1>
+
+    {{if .Error}}
+      <div class="message error">{{.Error}}</div>
+    {{end}}
+
+    <div class="form-section">
+      <h2>Create a Short Link</h2>
+      <form method="POST" action="/create">
+        <input type="text" name="url" placeholder="Enter the long URL..." required>
+        <input type="text" name="slug" placeholder="Custom slug (optional)">
+        <button type="submit">Shorten</button>
+      </form>
+      {{if .Success}}
+      <div class="message success">
+        Shortened: <a href="/{{.Success}}" target="_blank">http://localhost:8080/{{.Success}}</a>
+      </div>
+     {{end}}
+    </div>
+
+    <h2>Your Short Links</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Short URL</th>
+          <th>Original URL</th>
+          <th>Clicks</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Links}}
+          <tr>
+            <td><a href="/{{.ShortSlug}}" target="_blank">/{{.ShortSlug}}</a></td>
+            <td><a href="{{.OriginalURL}}" target="_blank">{{.OriginalURL}}</a></td>
+            <td>{{.ClickCount}}</td>
+            <td>
+              <form method="POST" action="/delete" class="inline">
+                <input type="hidden" name="id" value="{{.ID}}">
+                <button type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {{else}}
+          <tr>
+            <td colspan="4" style="text-align: center;">No links yet.</td>
+          </tr>
+        {{end}}
+      </tbody>
+    </table>
+
+    <div class="logout">
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+</body>
+</html>
