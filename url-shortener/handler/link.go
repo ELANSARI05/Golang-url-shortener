@@ -61,17 +61,8 @@ func CreateLinkHandler(w http.ResponseWriter, r *http.Request) {
 		renderDashboardWithError(w, userID, "Error saving short link")
 		return
 	}
-	links, _ := model.GetLinksByUserID(userID)
-	tmpl, _ := template.ParseFiles("templates/dashboard.html")
-	tmpl.Execute(w, struct {
-		Links   []model.ShortLink
-		Error   string
-		Success string
-	}{
-		Links:   links,
-		Error:   "",
-		Success: slug,
-	})
+	http.Redirect(w, r, "/dashboard?success="+slug, http.StatusSeeOther)
+
 }
 func renderDashboardWithError(w http.ResponseWriter, userID int, errorMsg string) {
 	links, err := model.GetLinksByUserID(userID)
