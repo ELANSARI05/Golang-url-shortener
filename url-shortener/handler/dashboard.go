@@ -52,7 +52,6 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 
 	successSlug := r.URL.Query().Get("success")
 
-	// 🔧 Capture the execute error in its own variable
 	execErr := tmpl.Execute(w, struct {
 		Links   []model.ShortLink
 		Error   string
